@@ -2,16 +2,19 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
+	"io"
 	"net"
+	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 )
 
-var testData = []Body(`"
+var testData = `
 {
-	"zscaler.net":{
+	"zscloud.net":{
 	   "continent : EMEA":{
 		  "city : Abu Dhabi I":[
 			 {
@@ -22,73 +25,45 @@ var testData = []Body(`"
 				"latitude":"24.453884",
 				"longitude":"54.3773438"
 			 }
-		  ],
-		  "city : Amsterdam II":[
-			 {
-				"range":"147.161.172.0/23",
-				"vpn":"",
-				"gre":"",
-				"hostname":"",
-				"latitude":"52",
-				"longitude":"5"
-			 },
-			 {
-				"range":"165.225.240.0/23",
-				"vpn":"ams2-2-vpn.zscaler.net",
-				"gre":"165.225.240.12",
-				"hostname":"ams2-2.sme.zscaler.net",
-				"latitude":"52",
-				"longitude":"5"
-			 }
-		  ]
-	   },
-	   "continent : EMEA":{
-		  "city : Abu Dhabi I":[
-			 {
-				"range":"147.161.175.0/23",
-				"vpn":"",
-				"gre":"",
-				"hostname":"",
-				"latitude":"24.453884",
-				"longitude":"54.3773438"
-			 }
-		  ],
-		  "city : Amsterdam II":[
-			 {
-				"range":"147.161.173.0/23",
-				"vpn":"",
-				"gre":"",
-				"hostname":"",
-				"latitude":"52",
-				"longitude":"5"
-			 },
-			 {
-				"range":"165.225.250.0/23",
-				"vpn":"ams2-2-vpn.zscaler.net",
-				"gre":"165.225.240.12",
-				"hostname":"ams2-2.sme.zscaler.net",
-				"latitude":"52",
-				"longitude":"5"
-			 }
 		  ]
 	   }
 	}
- }
-"`)
+ }`
 
 // Ensure api response is parsed correctly
 func TestExtractIpPrefixes(t *testing.T) {
 	t.Parallel()
 
-	prefixes, err := ExtractIpPrefixes(testData)
-	if err != nil {
-		t.Errorf("Could no unmarshall json.")
+	resp := &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewReader([]byte(testData))),
 	}
 
-	// marshal test data to struct
+	got := ExtractIpPrefixes(ToStructE(resp))
+	wants := []string{"147.161.174.0/23"}
 
-	// assert actual with got
-	fmt.Println(prefixes)
+	assert.ElementsMatch(t, got, wants)
+}
+
+// Ensure http json response to struct
+func TestToStructE(t *testing.T) {
+	t.Parallel()
+
+	resp := &http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewReader([]byte(testData))),
+	}
+
+	responseLiteral := Response{map[string]map[string]City{
+		"continent : EMEA": {
+			"city : Abu Dhabi I": City{
+				{"147.161.174.0/23"},
+			},
+		},
+	}}
+
+	response := ToStructE(resp)
+	assert.True(t, reflect.DeepEqual(response, responseLiteral))
 }
 
 // Ensure that zscaler ips are filtered ipv4 only
@@ -96,7 +71,7 @@ func TestActualTerraformOutputIsIp4(t *testing.T) {
 	t.Parallel()
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "fixtures/",
+		TerraformDir: "tests/fixtures/",
 	})
 
 	defer terraform.Destroy(t, terraformOptions)

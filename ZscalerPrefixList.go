@@ -3,53 +3,43 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strings"
 )
 
+const zscalerNetApi = "https://api.config.zscaler.com/zscloud.net/cenr/json"
+
 // handle dynamic json keys
 type Response struct {
-	ZscloudNet map[string]map[string]city `json:"zscloud.net"`
+	ZsCloudNet map[string]map[string]City `json:"zscloud.net"`
 }
 
-type city []struct {
+type City []struct {
 	Range string `json:"range"`
 }
 
-type Body []byte
-
-type ResponseBody interface {
-	io.ReadCloser
-	Close() error
-}
-
-func (b Body) Close() error {
-	return nil
-}
-
 // return slice "prefixes" containing ipv4 and ipv6 prefixes for each city for each continent
-func ExtractIpPrefixes(b Body) ([]string, error) {
-	var response Response
-
-	// pointer automatically dereferenced (*r).Body
-	if err := json.NewDecoder(b).Decode(&response); err != nil {
-		return nil, err
-	}
-
+func ExtractIpPrefixes(r Response) []string {
 	var prefixes []string
 
-	for _, continent := range response.ZscloudNet {
+	for _, continent := range r.ZsCloudNet {
 		for _, city := range continent {
 			prefixes = append(prefixes, city[0].Range)
 		}
 	}
-
-	return prefixes, nil
+	return prefixes
 }
 
-const zscaler = "https://api.config.zscaler.com/zscloud.net/cenr/json"
+func ToStructE(r *http.Response) Response {
+	var response Response
+
+	// pointer automatically dereferenced (*res).Body
+	if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
+		log.Fatalln(err)
+	}
+	return response
+}
 
 // break up for testing?
 // create fixture for output testing
@@ -57,24 +47,21 @@ const zscaler = "https://api.config.zscaler.com/zscloud.net/cenr/json"
 // add interface to convert based on argument -terraform -json (default to json)
 func main() {
 
-	res, err := http.Get(zscaler)
+	resp, err := http.Get(zscalerNetApi)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
-	if res.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusOK {
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		prefixes, err := ExtractIpPrefixes(res.Body)
-
-		if err != nil {
-			log.Fatalln(err)
-		}
+		fmt.Printf("%#v\n", resp.Body)
+		prefixes := ExtractIpPrefixes(ToStructE(resp))
 
 		// output consumable as input to terraform external data provider
 		jsonOutput := fmt.Sprintf("{\"prefix_list\": \"%s\"}", strings.Join(prefixes, " "))
