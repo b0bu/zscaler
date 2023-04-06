@@ -1,4 +1,4 @@
-module zscaler
+module github.com/b0bu/zscaler
 
 go 1.20
 
