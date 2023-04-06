@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const zscalerNetApi = "https://api.config.zscaler.com/zscloud.net/cenr/json"
+const zscalerNetApiEndpoint = "https://api.config.zscaler.com/zscloud.net/cenr/json"
 
 // handle dynamic json keys
 type Response struct {
@@ -41,13 +41,19 @@ func ToStructE(r *http.Response) Response {
 	return response
 }
 
-// break up for testing?
-// create fixture for output testing
-// push to git and pull
-// add interface to convert based on argument -terraform -json (default to json)
+func FetchPrefixList(endpoint string) (*http.Response, error) {
+	resp, err := http.Get(endpoint)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func main() {
 
-	resp, err := http.Get(zscalerNetApi)
+	resp, err := FetchPrefixList(zscalerNetApiEndpoint)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -60,7 +66,6 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		fmt.Printf("%#v\n", resp.Body)
 		prefixes := ExtractIpPrefixes(ToStructE(resp))
 
 		// output consumable as input to terraform external data provider

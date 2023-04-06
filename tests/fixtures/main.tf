@@ -1,5 +1,5 @@
 data "external" "zscaler_ranges" {
-  program = ["../../zscaler_prefix_list"]
+  program = ["../../zscaler"]
 }
 
 locals {

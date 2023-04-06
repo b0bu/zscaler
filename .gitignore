@@ -1,4 +1,5 @@
 # Local .terraform directories
+zscaler
 **/.terraform/*
 
 # .tfstate files

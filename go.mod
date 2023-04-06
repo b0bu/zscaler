@@ -1,4 +1,4 @@
-module main
+module zscaler
 
 go 1.20
 
