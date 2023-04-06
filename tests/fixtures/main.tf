@@ -1,5 +1,5 @@
 data "external" "zscaler_ranges" {
-  program = ["../../zscaler"]
+  program = ["zscaler"]
 }
 
 locals {
