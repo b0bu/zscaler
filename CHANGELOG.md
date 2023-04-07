@@ -1,3 +1,20 @@
+## [1.0.1](https://github.com/b0bu/zscaler/compare/v1.0.0...v1.0.1) (2023-04-07)
+
+
+### Misc
+
+* update comment and add note about X.Y.Z version ([7411ce8](https://github.com/b0bu/zscaler/commit/7411ce8f15bb671674dc580b4c21033ceaacb439))
+
+
+### Improvements
+
+* update function name ([c0534a7](https://github.com/b0bu/zscaler/commit/c0534a7af65b3e9b910c6aa1559cae5fcd880c98))
+
+
+### Automation
+
+* add http test ([68050bc](https://github.com/b0bu/zscaler/commit/68050bc064b2508686430069dc4ff36372d5743c))
+
 ## 1.0.0 (2023-04-06)
 
 
