@@ -62,3 +62,9 @@ func TestToStructE(t *testing.T) {
 	response := ToStructE(resp)
 	assert.True(t, reflect.DeepEqual(response, responseLiteral))
 }
+
+func TestHttpGet(t *testing.T) {
+	resp, _ := HttpGet("http://checkip.amazonaws.com")
+	defer resp.Body.Close()
+	assert.True(t, resp.StatusCode == 200)
+}
