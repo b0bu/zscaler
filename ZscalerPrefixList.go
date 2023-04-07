@@ -41,7 +41,7 @@ func ToStructE(r *http.Response) Response {
 	return response
 }
 
-func FetchPrefixList(endpoint string) (*http.Response, error) {
+func HttpGet(endpoint string) (*http.Response, error) {
 	resp, err := http.Get(endpoint)
 
 	if err != nil {
@@ -53,7 +53,7 @@ func FetchPrefixList(endpoint string) (*http.Response, error) {
 
 func main() {
 
-	resp, err := FetchPrefixList(zscalerNetApiEndpoint)
+	resp, err := HttpGet(zscalerNetApiEndpoint)
 
 	if err != nil {
 		log.Fatalln(err)
