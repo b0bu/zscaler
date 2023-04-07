@@ -10,8 +10,8 @@ go get github.com/b0bu/zscaler
 ```
 
 ```bash
-# outside of module install
-go install github.com/b0bu/zscaler@main
+# pipeline install
+go install github.com/b0bu/zscaler@vX.Y.Z
 ```
 
 implementing this for tf where `local.zscaler_ipv4_ranges` can be used to update zscaler prefixes.
