@@ -51,7 +51,7 @@ func TestToStructE(t *testing.T) {
 		Body:       io.NopCloser(bytes.NewReader([]byte(testData))),
 	}
 
-	responseLiteral := Response{map[string]map[string]City{
+	wants := Response{map[string]map[string]City{
 		"continent : EMEA": {
 			"city : Abu Dhabi I": City{
 				{"147.161.174.0/23"},
@@ -59,8 +59,8 @@ func TestToStructE(t *testing.T) {
 		},
 	}}
 
-	response := ToStructE(resp)
-	assert.True(t, reflect.DeepEqual(response, responseLiteral))
+	got := ToStructE(resp)
+	assert.True(t, reflect.DeepEqual(got, wants))
 }
 
 func TestHttpGet(t *testing.T) {
