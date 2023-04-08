@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/b0bu/zscaler/compare/v1.0.1...v1.0.2) (2023-04-08)
+
+
+### Improvements
+
+* add wants and got ([c4ab484](https://github.com/b0bu/zscaler/commit/c4ab4849570e4fd8460529392c89ce43c8630a60))
+* move 'if' and 'err' to http func and return custom error ([9830e8e](https://github.com/b0bu/zscaler/commit/9830e8ee2d721ca0fe228f01b25bd0237e251994))
+
 ## [1.0.1](https://github.com/b0bu/zscaler/compare/v1.0.0...v1.0.1) (2023-04-07)
 
 
