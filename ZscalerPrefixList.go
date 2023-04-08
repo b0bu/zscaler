@@ -43,12 +43,14 @@ func ToStructE(r *http.Response) Response {
 
 func HttpGet(endpoint string) (*http.Response, error) {
 	resp, err := http.Get(endpoint)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	if resp.StatusCode == http.StatusOK {
+		return resp, nil
+	}
+	return nil, fmt.Errorf("expected 200 response got %d", resp.StatusCode)
 }
 
 func main() {
@@ -61,16 +63,10 @@ func main() {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
-		if err != nil {
-			log.Fatalln(err)
-		}
+	prefixes := ExtractIpPrefixes(ToStructE(resp))
 
-		prefixes := ExtractIpPrefixes(ToStructE(resp))
-
-		// output consumable as input to terraform external data provider
-		jsonOutput := fmt.Sprintf("{\"prefix_list\": \"%s\"}", strings.Join(prefixes, " "))
-		fmt.Println(jsonOutput)
-	}
+	// output consumable as input to terraform external data provider
+	jsonOutput := fmt.Sprintf("{\"prefix_list\": \"%s\"}", strings.Join(prefixes, " "))
+	fmt.Println(jsonOutput)
 
 }
