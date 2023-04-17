@@ -19,13 +19,25 @@ type City []struct {
 	Range string `json:"range"`
 }
 
+// filter cities by allow list
+func allowedRegion(s string) bool {
+	regions := []string{"Amsterdam", "London", "Paris", "Manchester"}
+	for _, region := range regions {
+		if strings.Contains(s, region) {
+			return true
+		}
+	}
+	return false
+}
+
 // return slice "prefixes" containing ipv4 and ipv6 prefixes for each city for each continent
 func ExtractIpPrefixes(r Response) []string {
 	var prefixes []string
-
 	for _, continent := range r.ZsCloudNet {
-		for _, city := range continent {
-			prefixes = append(prefixes, city[0].Range)
+		for city, ranges := range continent {
+			if allowedRegion(city) {
+				prefixes = append(prefixes, ranges[0].Range)
+			}
 		}
 	}
 	return prefixes
