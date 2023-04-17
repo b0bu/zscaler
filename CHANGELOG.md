@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/b0bu/zscaler/compare/v1.0.2...v1.1.0) (2023-04-17)
+
+
+### Features
+
+* add allow list ([ad34b21](https://github.com/b0bu/zscaler/commit/ad34b2130b748a5ff17995a629e0cc854912d34d))
+
 ## [1.0.2](https://github.com/b0bu/zscaler/compare/v1.0.1...v1.0.2) (2023-04-08)
 
 
